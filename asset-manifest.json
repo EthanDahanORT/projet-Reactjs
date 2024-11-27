@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/EthanDahanORT/projet-Reactjs/static/css/main.f855e6bc.css",
+    "main.js": "/EthanDahanORT/projet-Reactjs/static/js/main.e3f39942.js",
+    "static/js/453.283dea91.chunk.js": "/EthanDahanORT/projet-Reactjs/static/js/453.283dea91.chunk.js",
+    "static/media/logo.svg": "/EthanDahanORT/projet-Reactjs/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "index.html": "/EthanDahanORT/projet-Reactjs/index.html",
+    "main.f855e6bc.css.map": "/EthanDahanORT/projet-Reactjs/static/css/main.f855e6bc.css.map",
+    "main.e3f39942.js.map": "/EthanDahanORT/projet-Reactjs/static/js/main.e3f39942.js.map",
+    "453.283dea91.chunk.js.map": "/EthanDahanORT/projet-Reactjs/static/js/453.283dea91.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f855e6bc.css",
+    "static/js/main.e3f39942.js"
+  ]
+}
