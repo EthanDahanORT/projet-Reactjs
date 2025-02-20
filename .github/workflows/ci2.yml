@@ -1,24 +1,36 @@
-stages:
-  - deploy
+name: Deploy to EC2
 
-deploy:
-  stage: deploy
-  only:
-    - main
-  script:
-    - echo "Mise à jour des paquets..."
-    - sudo apt update -y && sudo apt upgrade -y
-    - echo "Installation d'OpenSSH client..."
-    - sudo apt install -y openssh-client
-    - echo "Configuration de la clé SSH..."
-    - mkdir -p ~/.ssh
-    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
-    - chmod 600 ~/.ssh/id_rsa
-    - eval $(ssh-agent -s)
-    - ssh-add ~/.ssh/id_rsa
-    - echo "Ajout de l'hôte au fichier known_hosts..."
-    - ssh-keyscan -H $EC2_HOST >> ~/.ssh/known_hosts
-    - echo "Connexion et déploiement..."
-    - ssh $EC2_USER@$EC2_HOST "cd /chemin/du/projet && git pull origin main && exit"
-    - echo "Nettoyage..."
-    - rm -rf ~/.ssh
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Update packages
+        run: |
+          sudo apt update -y && sudo apt upgrade -y
+      
+      - name: Install OpenSSH client
+        run: |
+          sudo apt install -y openssh-client
+      
+      - name: Configure SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+      
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "cd /chemin/du/projet && git pull origin main"
+      
+      - name: Cleanup
+        run: |
+          rm -rf ~/.ssh
