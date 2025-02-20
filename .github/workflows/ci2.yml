@@ -8,29 +8,38 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      
-      # - name: Update packages
-      #   run: |
-      #     sudo apt update -y && sudo apt upgrade -y
-      
+
       - name: Install OpenSSH client
-        run: |
-          sudo apt install -y openssh-client
-      
+        run: sudo apt install -y openssh-client
+
       - name: Configure SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
-      
+
       - name: Deploy to EC2
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /home/raphael/projet-Reactjs && git pull origin main"
-      
-      - name: Cleanup
-        run: |
-          rm -rf ~/.ssh
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            cd /home/raphael/projet-Reactjs
+            
+            echo "📌 Arrêt et suppression du conteneur existant..."
+            docker-compose down
+            
+            echo "🗑 Suppression des anciens conteneurs et images..."
+            docker system prune -af
+
+            echo "🚀 Reconstruction et redémarrage du conteneur..."
+            docker-compose up -d --build
+
+            echo "✅ Déploiement terminé avec succès !"
+          EOF
+
+      - name: Cleanup SSH keys
+        run: rm -rf ~/.ssh
+
