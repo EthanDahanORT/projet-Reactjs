@@ -1,7 +1,9 @@
 version: '3.8'
 
 services:
+  # 🔹 Service ReactJS
   app:
+    container_name: react-app
     build: .
     ports:
       - "3000:3000"
@@ -10,4 +12,50 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://user:password@db:5432/mydatabase
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.react.rule=Host(`app.mondomaine.com`)"
+      - "traefik.http.routers.react.entrypoints=websecure"
+      - "traefik.http.routers.react.tls.certresolver=letsencrypt"
+
+  # 🔹 Base de données PostgreSQL (remplacez par MySQL si nécessaire)
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backup:/backup
+    labels:
+      - "traefik.enable=false"
+
+  # 🔹 Reverse proxy Traefik avec gestion SSL
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    restart: always
+    command:
+      - "--api.dashboard=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=admin@mondomaine.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-data:/letsencrypt
+
+volumes:
+  pgdata:
+  traefik-data:
