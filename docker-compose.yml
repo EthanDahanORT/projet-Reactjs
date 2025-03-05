@@ -1,23 +1,55 @@
-version: '3'
+version: '3.8'
 
 services:
-  traefik:
-    image: traefik:v2.10
-    restart: always
-    command:
-      - "--api.insecure=true" # Interface de Traefik (à désactiver en prod)
-      - "--providers.docker=true"
-      - "--entrypoints.web.address=:80"
-    ports:
-      - "80:80" # Redirige le trafic HTTP vers Traefik
-      - "8080:8080" # Interface de monitoring de Traefik
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-
-  react-app:
+  # 🔹 Service ReactJS
+  app:
+    container_name: react-app
     build: .
+    ports:
+      - "80:80"
+      - "8080:8080" 
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgres://user:password@db:5432/mydatabase
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.react-app.rule=Host(`ethan.soudry-ort.online`)"
-      - "traefik.http.services.react-app.loadbalancer.server.port=3000"
+      - "traefik.http.routers.react.rule=Host(`ethan.soudry-ort.online`)"
+      - "traefik.http.routers.react.entrypoints=websecure"
+      - "traefik.http.routers.react.tls.certresolver=letsencrypt"
+
+  # 🔹 Base de données PostgreSQL (remplacez par MySQL si nécessaire)
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backup:/backup
+    labels:
+      - "traefik.enable=false"
+
+  # 🔹 Reverse proxy Traefik avec gestion SSL
+  traefik:
+    image: traefik:v2.9
+    container_name: traefik
+    restart: always
+ 
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - traefik-data:/letsencrypt
+
+volumes:
+  pgdata:
+  traefik-data:
