@@ -17,7 +17,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.react.rule=Host(`Ethan.Soudry-ort.online`)"
+      - "traefik.http.routers.react.rule=Host(`ethan.soudry-ort.online`)"
       - "traefik.http.routers.react.entrypoints=websecure"
       - "traefik.http.routers.react.tls.certresolver=letsencrypt"
 
