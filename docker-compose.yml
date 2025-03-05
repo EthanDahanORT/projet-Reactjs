@@ -29,11 +29,8 @@ services:
     container_name: react-app
     build: .
     restart: always
-    depends_on:
-      - db
     environment:
       - NODE_ENV=production
-      - PORT=3000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.react.rule=Host(`ethan.soudry-ort.online`)"
