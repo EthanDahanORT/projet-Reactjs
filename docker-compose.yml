@@ -6,7 +6,7 @@ services:
     container_name: react-app
     build: .
     ports:
-      - "3000:3000"
+      - "80:80"
     volumes:
       - .:/app
       - /app/node_modules
@@ -17,7 +17,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.react.rule=Host(`app.mondomaine.com`)"
+      - "traefik.http.routers.react.rule=Host(`Ethan.Soudry-ort.online`)"
       - "traefik.http.routers.react.entrypoints=websecure"
       - "traefik.http.routers.react.tls.certresolver=letsencrypt"
 
