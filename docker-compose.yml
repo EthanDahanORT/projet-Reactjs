@@ -34,30 +34,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_URL=postgres://user:password@db:5432/mydatabase
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.react.rule=Host(`ethan.soudry-ort.online`)"
       - "traefik.http.routers.react.entrypoints=web"
       # - "traefik.http.routers.react.tls.certresolver=letsencrypt"
       - "traefik.http.services.react.loadbalancer.server.port=3000"
-
-  # 🔹 Base de données PostgreSQL avec backup automatique
-  db:
-    image: postgres:15
-    container_name: postgres-db
-    restart: always
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mydatabase
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - ./backup:/backup
-    labels:
-      - "traefik.enable=false"
-    command: ["bash", "-c", "exec postgres"]
-
-volumes:
-  pgdata:
-  traefik-data:
