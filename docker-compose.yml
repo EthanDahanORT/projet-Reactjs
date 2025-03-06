@@ -1,41 +1,23 @@
-version: '3.8'
+version: '3'
 
 services:
-  # 🔹 Reverse proxy Traefik pour gérer les requêtes et le SSL
-  # traefik:
-  #   image: traefik:v2.9
-  #   container_name: traefik
-  #   restart: always
-  #   command:
-  #     - "--api.insecure=true"
-  #     - "--providers.docker=true"
-  #     - "--providers.docker.exposedbydefault=false"
-  #     - "--providers.file.directory=/etc/traefik"
-  #     - "--providers.file.watch=true"
-  #     - "--entrypoints.web.address=:80"
-  #     # - "--entrypoints.websecure.address=:443"
-  #     # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-  #     # - "--certificatesresolvers.letsencrypt.acme.email=ethan.soudry-ort.online"
-  #     # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-  #   ports:
-  #     - "80:80"
-  #     # - "443:443"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ".:/etc/traefik"
+  traefik:
+    image: traefik:v2.10
+    restart: always
+    command:
+      - "--api.insecure=true" # Interface de Traefik (à désactiver en prod)
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80" # Redirige le trafic HTTP vers Traefik
+      - "8080:8080" # Interface de monitoring de Traefik
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
 
-  # 🔹 Service ReactJS
-  app:
-    container_name: react-app
+  react-app:
     build: .
     restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.http.routers.react.rule=Host(`ethan.soudry-ort.online`)"
-    #   - "traefik.http.routers.react.entrypoints=web"
-    #   # - "traefik.http.routers.react.tls.certresolver=letsencrypt"
-    #   - "traefik.http.services.react.loadbalancer.server.port=3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.react-app.rule=Host(`nathan.soudry-ort.online`)"
+      - "traefik.http.services.react-app.loadbalancer.server.port=3000"
