@@ -27,6 +27,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             cd /home/raphael/projet-Reactjs
+
+            git pull origin main
             
             echo "📌 Arrêt et suppression du conteneur existant..."
             docker-compose down
