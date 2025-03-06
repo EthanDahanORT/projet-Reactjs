@@ -19,5 +19,5 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.react-app.rule=Host(`nathan.soudry-ort.online`)"
+      - "traefik.http.routers.react-app.rule=Host(`ethan.soudry-ort.online`)"
       - "traefik.http.services.react-app.loadbalancer.server.port=3000"
