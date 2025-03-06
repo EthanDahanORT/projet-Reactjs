@@ -13,15 +13,16 @@ services:
       - "--providers.file.directory=/etc/traefik"
       - "--providers.file.watch=true"
       - "--entrypoints.web.address=:80"
-      # - "--entrypoints.websecure.address=:443"
-      # - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-      # - "--certificatesresolvers.letsencrypt.acme.email=ethan.soudry-ort.online"
-      # - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=ethan.soudry-ort.online"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
     ports:
       - "80:80"
-      # - "443:443"
+      - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - "./letsencrypt:/letsencrypt"
       - ".:/etc/traefik"
 
   # 🔹 Service ReactJS
@@ -36,6 +37,6 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.react.rule=Host(`ethan.soudry-ort.online`)"
-      - "traefik.http.routers.react.entrypoints=web"
-      # - "traefik.http.routers.react.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.react.entrypoints=websecure"
+      - "traefik.http.routers.react.tls.certresolver=letsencrypt"
       - "traefik.http.services.react.loadbalancer.server.port=3000"
